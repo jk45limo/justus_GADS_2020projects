@@ -1,0 +1,37 @@
+Lab: Google Cloud Fundamentals; Getting Started with GKE
+
+Objectives:
+	-provision a kubernetes cluster using Kubernetes Engine.
+	-Deploy and manage Docker containers using kubectl.
+
+Task 1: Start a Kubernetes Engine cluster
+	-place the zone you are in, in an enviromental variable called MY_ZONE
+		export MY_ZONE=us-central1-a
+
+	-Start a Kubernetes cluster managed by Kubernetes Engine named webfrontend and configure it to 2 nodes
+		gcloud container clusters create webfrontend --zone $MY_ZONE --num-nodes 2
+	
+	-check the version of the kubernetes you are using
+		kubectl version
+
+Task 2: Run and deploy a container
+	-launch a single instance of the nginx container.
+		kubectl create deploy nginx --image=nginx:1.17.10
+	
+	-View the pod running the nginx container
+		kubectl get pods
+	
+	-Expose the nginx container to the Internet
+		kubectl expose deployment nginx --port 80 --type LoadBalancer
+
+	-View the new service, where you will get an external address that shows the default home page of the Nginx browser.
+		kubectl get services
+
+	-You can also scale up the number of pods running on your service
+		kubectl scale deployment nginx --replicas 3
+
+	-Confirm that Kubernetes has updated the number of pods
+		kubectl get pods
+
+	-Confirm that your external IP address has not changed
+		kubectl get services
