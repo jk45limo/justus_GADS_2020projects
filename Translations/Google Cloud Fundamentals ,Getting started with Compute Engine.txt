@@ -1,0 +1,76 @@
+Lab: Google Cloud Fundamentals:Getting started with Compute Engine
+
+Objectives:
+	-Create a Compute Engine virtual machine using the Google Cloud platform(gcp)
+	-Create a Compute Engine virtual machine using the gcloud command-line interface.
+	-Connect between two instances.
+
+Task 1:
+	-Create a virtual machine using the GCP Console. 
+	  Name: my-vm-1
+	  Boot disk: Debian GNU/Linux 9(stretch)
+	  Allow HTTP traffic.
+	
+	  Enter the following command
+	
+		gcloud beta compute --project=qwiklabs-gcp-02-3cfbebfd6615 instances create my-vm-1 --zone=us-central1-a --machine-type=e2-medium --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=753245289169-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --tags=http-server --image=debian-9-stretch-v20200902 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=my-vm-1 --reservation-affinity=any
+
+		gcloud compute --project=qwiklabs-gcp-02-3cfbebfd6615 firewall-rules create default-allow-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:80 --source-ranges=0.0.0.0/0 --target-tags=http-server
+
+Task 2:Create a virtual machine using the gcloud command line
+	- list all the zones in your region using the following command.
+		
+		gcloud compute zones list | grep us-central1
+	
+	-select your specific zone and set it to the default zone with this command.
+				
+		gcloud config set compute/zone us-central1-b
+	-create a vm called my-vm-2 in your specific zone using this command
+
+		gcloud compute instances create "my-vm-2" \
+		--machine-type "n1-standard-1" \
+		--image-project "debian-cloud" \
+		--image "debian-9-stretch-v20190213" \
+		--subnet "default"
+
+Task 3:Connect between VM instances
+	-ssh into the my-vm-2 instance,replacing the PROJECT_ID with your Project ID.
+		
+		gcloud compute ssh --project <PROJECT_ID> --zone us-central1-a my-vm-2
+
+	-Use ping command to confirm that my-vm-2 can reach my-vm-1
+		
+		ping my-vm-1
+
+	-press ctrl+c to stop the pinging
+
+	-Use the ssh command to open a command prompt on my-vm-1. if prompted type yes.
+
+		ssh my-vm-1
+	
+	-Install Nginx web server
+		
+		sudo apt -get install nginx-light -y
+
+	-Use the nano text editor to add a custom message to the home page of the web server
+
+		sudo nano /var/www/html/index.nginx-debian.html
+
+	-Just below the <h1> tag add a text 
+		"hi from Justus" 
+	  then press CTRL+O 
+	  then Enter 
+	  then press CTRL+X to exit.
+
+	-Confirm that the web server is serving your new page.
+	
+		curl http://localhost/
+
+	-Exit the my-vm-1 command prompt by entering this command. 
+
+		exit 
+
+	-To confirm that my-vm-2 can reach the webserver on my-vm-1, enter this command on my-vm-2 ssh
+
+		curl http://my-vm-1/
+	The response will again be the html source of the web server's home page, including your line of custom text.
